@@ -1,9 +1,9 @@
-from analogy.wrapper import Wrapper
+from analogy.wrapper import Base
 import numpy
 from gensim.models import KeyedVectors
 
 
-class Gensim(Wrapper):
+class Wrapper(Base):
     """
     An example of the analogy-test wrapper that works for gensims keyed vectors.
     """
@@ -32,6 +32,6 @@ class Gensim(Wrapper):
 
     @staticmethod
     def load(path):
-        return Gensim(KeyedVectors.load_word2vec_format(path))
+        return Wrapper(KeyedVectors.load_word2vec_format(path))
 
 
