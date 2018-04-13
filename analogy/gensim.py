@@ -12,6 +12,25 @@ class Wrapper(Base):
         self.w2i = {w: i for i, w in enumerate(model.index2word)}
         self.model.init_sims(replace=True)
 
+    def analogies_index(self, queries):
+        m = self.model.syn0norm
+        aa, bb, xx, yy = zip(*queries)
+        N = len(aa)
+        ai = [self.w2i[a] for a in aa]
+        bi = [self.w2i[b] for b in bb]
+        xi = [self.w2i[x] for x in xx]
+        yi = [self.w2i[y] for y in yy]
+        v = m[bi] + m[xi] - m[ai]
+        y = numpy.empty((N, 1))
+        sims = v @ m.T
+        for i in range(N):
+            sims[i, ai[i]] = float('-inf')
+            sims[i, bi[i]] = float('-inf')
+            sims[i, xi[i]] = float('-inf')
+            y[i, 0] = sims[i, yi[i]]
+
+        return [int(c) for c in numpy.less(y, sims).sum(1)]
+
     def analogies(self, queries):
         m = self.model.syn0norm
         aa, bb, xx = zip(*queries)

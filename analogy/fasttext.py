@@ -3,6 +3,7 @@ from analogy.metrics import Metrics
 import numpy
 import logging
 
+
 class Wrapper(Base):
     """
     An example of the analogy-test wrapper that works for fasttext-text formatted vectors.
@@ -15,13 +16,32 @@ class Wrapper(Base):
         self.m = Metrics(cm)
         self.m.set_transform(tm)
 
+    def analogies_index(self, queries):
+        aa, bb, xx, yy = zip(*queries)
+        N = len(aa)
+        ai = [self.w2i[a] for a in aa]
+        bi = [self.w2i[b] for b in bb]
+        xi = [self.w2i[x] for x in xx]
+        yi = [self.w2i[y] for y in yy]
+        sims = self.m.cosine_similarity(bi)
+        sims += self.m.cosine_similarity(xi)
+        sims -= self.m.cosine_similarity(ai)
+        v = numpy.empty((N, 1))
+        for i in range(N):
+            sims[i, ai[i]] = float('-inf')
+            sims[i, bi[i]] = float('-inf')
+            sims[i, xi[i]] = float('-inf')
+            v[i, 0] = sims[i, yi[i]]
+        return [int(c) for c in numpy.less(v, sims).sum(1)]
+
     def analogies(self, queries):
         aa, bb, xx = zip(*queries)
         ai = [self.w2i[a] for a in aa]
         bi = [self.w2i[b] for b in bb]
         xi = [self.w2i[x] for x in xx]
-        v = self.cm[bi] + self.cm[xi] - self.cm[ai]
-        sims = self.m.cosine_similarity(v)
+        sims = self.m.cosine_similarity(bi)
+        sims += self.m.cosine_similarity(xi)
+        sims -= self.m.cosine_similarity(ai)
         for i in range(len(aa)):
             sims[i, ai[i]] = float('-inf')
             sims[i, bi[i]] = float('-inf')

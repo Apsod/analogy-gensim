@@ -9,7 +9,7 @@ class Metrics(object):
         self.tt = None
 
     def get_n2(self, lhs):
-        if isinstance(lhs, slice):
+        if isinstance(lhs, slice) or isinstance(lhs, list):
             return self.n2[lhs]
         elif isinstance(lhs, numpy.ndarray):
             if self.tt is None:
@@ -34,7 +34,7 @@ class Metrics(object):
         return l2 + r2.T - 2*lr
 
     def dot_product(self, lhs, rhs=slice(None)):
-        if isinstance(lhs, slice):
+        if isinstance(lhs, slice) or isinstance(lhs, list):
             lm = self.matrix[lhs]
         elif isinstance(lhs, numpy.ndarray):
             lm = lhs
